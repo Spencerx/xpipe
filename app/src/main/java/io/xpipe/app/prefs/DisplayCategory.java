@@ -31,6 +31,9 @@ public class DisplayCategory extends AppPrefsCategory {
         return new OptionsBuilder()
                 .title("displayOptions")
                 .sub(new OptionsBuilder()
+                        .pref(prefs.disableHardwareAcceleration)
+                        .addToggle(prefs.disableHardwareAcceleration)
+                        .hide(!prefs.disableHardwareAcceleration().get())
                         .pref(prefs.uiScale)
                         .addComp(
                                 new IntFieldComp(prefs.uiScale).maxWidth(100).apply(struc -> {

@@ -1,7 +1,9 @@
 package io.xpipe.app.platform;
 
 import io.xpipe.app.core.AppProperties;
+import io.xpipe.app.core.AppRestart;
 import io.xpipe.app.core.check.AppSystemFontCheck;
+import io.xpipe.app.core.mode.AppOperationMode;
 import io.xpipe.app.issue.ErrorEventFactory;
 import io.xpipe.app.prefs.AppPrefs;
 import io.xpipe.app.util.ThreadHelper;
@@ -15,6 +17,7 @@ import lombok.Setter;
 import lombok.SneakyThrows;
 
 import java.awt.*;
+import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
 public enum PlatformState {
@@ -37,6 +40,10 @@ public enum PlatformState {
     }
 
     public static void teardown() {
+        if (current != RUNNING) {
+            return;
+        }
+
         setCurrent(PlatformState.EXITED);
 
         // Give other threads, e.g. windows shutdown hook time to properly signal exit state
@@ -62,6 +69,25 @@ public enum PlatformState {
                         + " You don't have to install XPipe on any system like a server, a WSL distribution, a hypervisor, etc.,"
                         + " to have full access to that system, a shell connection to it is enough for XPipe to work from your local machine.";
         return msg;
+    }
+
+    public static void handleStderrMessage(String msg) {
+        if (current != RUNNING) {
+            return;
+        }
+
+        var l = List.of(
+                "java.lang.InternalError: Error loading stock shader",
+                "java.lang.RuntimeException: Error creating vertex shader",
+                "java.lang.RuntimeException: Error creating fragment shader",
+                "java.lang.RuntimeException: Error creating shader program"
+        );
+        if (l.stream().anyMatch(msg::contains)) {
+            teardown();
+            AppPrefs.get().setFromExternal(AppPrefs.get().disableHardwareAcceleration(), true);
+            AppPrefs.get().save();
+            AppRestart.restart();
+        }
     }
 
     private static void initPlatform() {

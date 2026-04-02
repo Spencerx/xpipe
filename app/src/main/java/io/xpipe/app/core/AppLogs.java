@@ -2,6 +2,7 @@ package io.xpipe.app.core;
 
 import io.xpipe.app.issue.ErrorEventFactory;
 import io.xpipe.app.issue.TrackEvent;
+import io.xpipe.app.platform.PlatformState;
 import io.xpipe.app.util.Deobfuscator;
 
 import lombok.Getter;
@@ -199,6 +200,8 @@ public class AppLogs {
                     if (line.length() == 0) {
                         return;
                     }
+
+                    PlatformState.handleStderrMessage(line);
 
                     TrackEvent.builder().type("error").message(line).build().handle();
                     baos.reset();
