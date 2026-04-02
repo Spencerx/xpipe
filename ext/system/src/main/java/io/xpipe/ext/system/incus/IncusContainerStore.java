@@ -97,8 +97,7 @@ public class IncusContainerStore
 
             @Override
             public ShellControl control(ShellControl parent) throws Exception {
-                refreshContainerState(
-                        getInstall().getStore().getHost().getStore().getOrStartSession());
+                refreshContainerState();
 
                 var user = identity != null ? identity.unwrap().getUsername().retrieveUsername() : null;
                 var sc = view(parent).exec(containerName, user, () -> {
@@ -136,9 +135,9 @@ public class IncusContainerStore
         };
     }
 
-    private void refreshContainerState(ShellControl sc) throws Exception {
+    private void refreshContainerState() throws Exception {
         var state = getState();
-        var view = view(sc);
+        var view = view();
         var displayState = view.queryContainerState(containerName);
         if (displayState.isEmpty()) {
             return;
@@ -156,27 +155,27 @@ public class IncusContainerStore
 
     @Override
     public void start() throws Exception {
-        var sc = getInstall().getStore().getHost().getStore().getOrStartSession();
         var view = view();
         view.start(containerName);
-        refreshContainerState(sc);
+        // Give the network some time to initialize so the state
+        // gets updated to include any IP address
+        ThreadHelper.sleep(500);
+        refreshContainerState();
     }
 
     @Override
     public void stop() throws Exception {
         stopSessionIfNeeded();
-        var sc = getInstall().getStore().getHost().getStore().getOrStartSession();
         var view = view();
         view.stop(containerName);
-        refreshContainerState(sc);
+        refreshContainerState();
     }
 
     @Override
     public void pause() throws Exception {
-        var sc = getInstall().getStore().getHost().getStore().getOrStartSession();
         var view = view();
         view.pause(containerName);
-        refreshContainerState(sc);
+        refreshContainerState();
     }
 
     @Override
@@ -192,7 +191,7 @@ public class IncusContainerStore
 
     @Override
     public void refreshHostAddressOrThrow() throws Exception {
-        refreshContainerState(getInstall().getStore().getHost().getStore().getOrStartSession());
+        refreshContainerState();
     }
 
     @Override

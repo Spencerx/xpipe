@@ -157,6 +157,9 @@ public class LxdContainerStore
     public void start() throws Exception {
         var view = view();
         view.start(containerName);
+        // Give the network some time to initialize so the state
+        // gets updated to include any IP address
+        ThreadHelper.sleep(500);
         refreshContainerState();
     }
 
