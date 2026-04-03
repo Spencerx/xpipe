@@ -3,6 +3,7 @@ package io.xpipe.app.cred;
 import io.xpipe.app.ext.ShellStore;
 import io.xpipe.app.issue.ErrorEventFactory;
 import io.xpipe.app.process.CommandBuilder;
+import io.xpipe.app.process.LocalShell;
 import io.xpipe.app.storage.DataStoreEntryRef;
 
 import lombok.Value;
@@ -74,7 +75,7 @@ public class SshAgentKeyList {
 
     public static List<Entry> listAgentIdentities(DataStoreEntryRef<ShellStore> ref, SshIdentityAgentStrategy strategy)
             throws Exception {
-        var session = ref.getStore().getOrStartSession();
+        var session = ref != null ? ref.getStore().getOrStartSession() : LocalShell.getShell();
         strategy.prepareParent(session);
 
         var socket = strategy.determinetAgentSocketLocation(session);

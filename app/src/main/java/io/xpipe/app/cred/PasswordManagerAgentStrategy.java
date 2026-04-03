@@ -11,6 +11,7 @@ import io.xpipe.app.process.CommandBuilder;
 import io.xpipe.app.process.ShellControl;
 import io.xpipe.app.pwman.PasswordManagerKeyConfiguration;
 import io.xpipe.app.storage.DataStorage;
+import io.xpipe.app.storage.DataStoreEntry;
 import io.xpipe.app.util.DocumentationLink;
 import io.xpipe.app.util.Validators;
 import io.xpipe.core.FilePath;
@@ -161,7 +162,8 @@ public class PasswordManagerAgentStrategy implements SshIdentityAgentStrategy {
         }
 
         return new PublicKeyStrategy.Dynamic(() -> {
-            return SshAgentKeyList.findAgentIdentity(DataStorage.get().local().ref(), this, identifier)
+            var ds = DataStorage.get();
+            return SshAgentKeyList.findAgentIdentity(ds != null ? ds.local().ref() : null, this, identifier)
                     .toString();
         });
     }
