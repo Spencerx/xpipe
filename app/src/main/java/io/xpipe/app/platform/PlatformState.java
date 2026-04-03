@@ -76,13 +76,15 @@ public enum PlatformState {
             return;
         }
 
+        // Quantum pipeline graphics driver issues are swallowed and only logged to stderr
+        // We can still detect them by looking for them in the stderr output
         var l = List.of(
                 "java.lang.InternalError: Error loading stock shader",
                 "java.lang.RuntimeException: Error creating vertex shader",
                 "java.lang.RuntimeException: Error creating fragment shader",
                 "java.lang.RuntimeException: Error creating shader program"
         );
-        if (l.stream().anyMatch(msg::contains)) {
+        if (AppPrefs.get() != null && !AppPrefs.get().disableHardwareAcceleration().get() && l.stream().anyMatch(msg::contains)) {
             teardown();
             AppPrefs.get().setFromExternal(AppPrefs.get().disableHardwareAcceleration(), true);
             AppPrefs.get().save();
