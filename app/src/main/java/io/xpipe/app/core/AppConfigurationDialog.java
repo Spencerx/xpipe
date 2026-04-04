@@ -5,6 +5,7 @@ import io.xpipe.app.comp.base.ModalOverlay;
 import io.xpipe.app.comp.base.ScrollComp;
 import io.xpipe.app.core.window.AppDialog;
 import io.xpipe.app.platform.OptionsBuilder;
+import io.xpipe.app.platform.PlatformState;
 import io.xpipe.app.prefs.EditorCategory;
 import io.xpipe.app.prefs.PasswordManagerCategory;
 import io.xpipe.app.prefs.PersonalizationCategory;
@@ -18,6 +19,11 @@ public class AppConfigurationDialog {
 
     public static void showIfNeeded() {
         if (!AppProperties.get().isInitialLaunch() || AppProperties.get().isTest()) {
+            return;
+        }
+
+        // We might be running in background mode
+        if (PlatformState.getCurrent() != PlatformState.RUNNING) {
             return;
         }
 
