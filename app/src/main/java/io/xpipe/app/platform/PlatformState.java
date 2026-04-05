@@ -1,11 +1,13 @@
 package io.xpipe.app.platform;
 
+import io.xpipe.app.core.AppCache;
 import io.xpipe.app.core.AppProperties;
 import io.xpipe.app.core.AppRestart;
 import io.xpipe.app.core.check.AppSystemFontCheck;
 import io.xpipe.app.core.mode.AppOperationMode;
 import io.xpipe.app.issue.ErrorEventFactory;
 import io.xpipe.app.prefs.AppPrefs;
+import io.xpipe.app.util.GlobalTimer;
 import io.xpipe.app.util.ThreadHelper;
 import io.xpipe.core.OsType;
 
@@ -17,6 +19,7 @@ import lombok.Setter;
 import lombok.SneakyThrows;
 
 import java.awt.*;
+import java.time.Duration;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
@@ -31,6 +34,7 @@ public enum PlatformState {
 
     private static Throwable lastError;
     private static boolean expectedError;
+    private static boolean restartQueued;
 
     public static Throwable getLastError() {
         if (expectedError) {
@@ -72,6 +76,10 @@ public enum PlatformState {
     }
 
     public static void handleStderrMessage(String msg) {
+        if (restartQueued) {
+            return;
+        }
+
         // Quantum pipeline graphics driver issues are swallowed and only logged to stderr
         // We can still detect them by looking for them in the stderr output
         var l = List.of(
@@ -82,10 +90,17 @@ public enum PlatformState {
         );
         if (AppPrefs.get() != null && AppPrefs.get().canSaveLocal() &&
                 !AppPrefs.get().disableHardwareAcceleration().get() && l.stream().anyMatch(msg::contains)) {
-            teardown();
-            AppPrefs.get().disableHardwareAcceleration().set(true);
-            AppPrefs.get().save();
-            AppRestart.restart();
+            restartQueued = true;
+            AppCache.update("hardwareAccelerationDisabled", true);
+            // Delay this to guarantee that the application starts up as much as possible
+            // This is to ensure that any initialization on initial startup is run
+            // It will get stuck at the first dialog if the graphics pipeline does not work
+            GlobalTimer.delay(() -> {
+                teardown();
+                AppPrefs.get().disableHardwareAcceleration().set(true);
+                AppPrefs.get().save();
+                AppRestart.restart();
+            }, Duration.ofSeconds(5));
         }
     }
 
