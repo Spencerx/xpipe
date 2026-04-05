@@ -192,7 +192,7 @@ public class CompressMenuProvider implements BrowserMenuBranchProvider {
         protected void create(String fileName, BrowserFileSystemTabModel model, List<BrowserEntry> entries) {
             var builder = io.xpipe.app.browser.menu.impl.compress.ZipActionProvider.Action.builder();
             builder.initEntries(model, entries);
-            builder.target(model.getCurrentDirectory().getPath().join(fileName));
+            builder.target(model.getTargetDirectory(entries.getFirst()).join(fileName));
             builder.directoryContentOnly(directory);
             builder.build().executeAsync();
         }
@@ -216,7 +216,7 @@ public class CompressMenuProvider implements BrowserMenuBranchProvider {
         protected void create(String fileName, BrowserFileSystemTabModel model, List<BrowserEntry> entries) {
             var builder = TarActionProvider.Action.builder();
             builder.initEntries(model, entries);
-            builder.target(model.getCurrentDirectory().getPath().join(fileName));
+            builder.target(model.getTargetDirectory(entries.getFirst()).join(fileName));
             builder.directoryContentOnly(directory);
             builder.gz(gz);
             builder.build().executeAsync();

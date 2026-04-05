@@ -50,7 +50,7 @@ public class UnzipActionProvider implements BrowserActionProvider {
                                 .addFile(getTarget(entry.getRawFileEntry().getPath()));
                     }
                     try (var cc = sc.command(command)
-                            .withWorkingDirectory(model.getCurrentDirectory().getPath())
+                            .withWorkingDirectory(model.getTargetDirectory(getEntries().getFirst()))
                             .start()) {
                         cc.discardOrThrow();
                     }
@@ -73,7 +73,7 @@ public class UnzipActionProvider implements BrowserActionProvider {
             }
             command.add("-Path").addFile(entry.getRawFileEntry().getPath());
             sc.command(command)
-                    .withWorkingDirectory(model.getCurrentDirectory().getPath())
+                    .withWorkingDirectory(model.getTargetDirectory(getEntries().getFirst()))
                     .execute();
         }
     }

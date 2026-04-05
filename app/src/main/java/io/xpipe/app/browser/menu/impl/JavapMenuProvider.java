@@ -55,7 +55,7 @@ public class JavapMenuProvider
                         .add("javap", "-c", "-p")
                         .addFile(entry.getRawFileEntry().getPath());
                 var out = sc.command(command)
-                        .withWorkingDirectory(model.getCurrentDirectory().getPath())
+                        .withWorkingDirectory(model.getTargetDirectory(entries.getFirst()))
                         .readStdoutOrThrow();
                 FileOpener.openReadOnlyString(out);
             }

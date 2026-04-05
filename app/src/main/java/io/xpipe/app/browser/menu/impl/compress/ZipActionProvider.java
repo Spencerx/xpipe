@@ -34,7 +34,7 @@ public class ZipActionProvider implements BrowserActionProvider {
             try {
                 var sc = model.getFileSystem().getShell().orElseThrow();
                 if (sc.getOsType() == OsType.WINDOWS) {
-                    var base = model.getCurrentDirectory().getPath();
+                    var base = model.getTargetDirectory(getEntries().getFirst());
                     var command = CommandBuilder.of()
                             .add("Compress-Archive", "-Force", "-DestinationPath")
                             .addFile(target)

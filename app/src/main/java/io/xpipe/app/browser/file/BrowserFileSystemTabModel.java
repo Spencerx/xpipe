@@ -286,6 +286,14 @@ public final class BrowserFileSystemTabModel extends BrowserStoreSessionTab<File
         return new FileEntry(fileSystem, currentPath.get(), null, null, null, FileKind.DIRECTORY);
     }
 
+    public FilePath getTargetDirectory(BrowserEntry fallbackFile) {
+        if (getCurrentDirectory() != null) {
+            return getCurrentDirectory().getPath();
+        }
+
+        return fallbackFile.getRawFileEntry().getPath().getParent();
+    }
+
     public void cdAsync(FilePath path) {
         cdAsync(path != null ? path.toString() : null);
     }
