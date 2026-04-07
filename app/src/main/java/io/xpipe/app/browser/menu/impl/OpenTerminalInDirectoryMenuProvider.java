@@ -30,7 +30,9 @@ public class OpenTerminalInDirectoryMenuProvider implements BrowserMenuLeafProvi
                         ? List.of(model.getCurrentDirectory().getPath())
                         : Collections.singletonList((FilePath) null);
         for (var dir : dirs) {
-            var name = model.getFileSystem().supportsTerminalWorkingDirectory() ? dir.toString() : null;
+            // IntelliJ says the null check is not needed, but it is!
+            // noinspection all
+            var name = model.getFileSystem().supportsTerminalWorkingDirectory() && dir != null ? dir.toString() : null;
             model.openTerminalAsync(
                     name,
                     model.getFileSystem().supportsTerminalWorkingDirectory() ? dir : null,
