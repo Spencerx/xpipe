@@ -162,7 +162,7 @@ public class StoreCreationDialog {
     private static ModalOverlay createModalOverlay(StoreCreationModel model) {
         var comp = new StoreCreationComp(model);
         comp.prefWidth(650);
-        var nameKey = model.isQuickConnect() ? "quickConnect" : model.storeTypeNameKey() + "Add";
+        var nameKey = model.isQuickConnect() ? "quickConnect" : model.getTitleKey();
         var modal = ModalOverlay.of(nameKey, comp);
         comp.apply(struc -> {
             struc.addEventHandler(KeyEvent.KEY_PRESSED, e -> {

@@ -25,7 +25,7 @@ public class StoreCreationQueueEntry extends AppLayoutModel.QueueEntry {
                         provider.getDisplayIconFileName(model.getStore().get()), 20)
                 : new LabelGraphic.IconGraphic("mdi2b-beaker-plus-outline");
         return new StoreCreationQueueEntry(
-                AppI18n.observable(model.storeTypeNameKey() + "Add"),
+                AppI18n.observable(model.getTitleKey()),
                 graphic,
                 () -> {
                     AppLayoutModel.get().selectConnections();

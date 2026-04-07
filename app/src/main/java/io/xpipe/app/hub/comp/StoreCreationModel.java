@@ -314,9 +314,13 @@ public class StoreCreationModel {
                 ? "connection"
                 : p.getCreationCategory().getCategory().equals(DataStorage.ALL_SCRIPTS_CATEGORY_UUID)
                         ? "script"
-                        : p.getCreationCategory().getCategory().equals(DataStorage.ALL_IDENTITIES_CATEGORY_UUID)
-                                ? "identity"
-                                : "macro";
+                        : "identity";
         return nameKey;
+    }
+
+    public String getTitleKey() {
+        var typeKey = storeTypeNameKey();
+        var actionKey = getExistingEntry() != null ? "Edit" : "Add";
+        return typeKey + actionKey;
     }
 }
