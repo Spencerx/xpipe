@@ -163,10 +163,15 @@ public class MstscRdpClient implements ExternalApplicationType.PathApplication, 
                         WindowsRegistry.HKEY_CURRENT_USER,
                         "Software\\Microsoft\\Terminal Server Client\\Servers\\localhost");
 
-        var localhost = configuration
+        var fullAddress = configuration
                 .getConfig()
-                .get("full address")
-                .orElseThrow()
+                .get("full address");
+        if (fullAddress.isEmpty()) {
+            return false;
+        }
+
+        var localhost = fullAddress
+                .get()
                 .getValue()
                 .startsWith("localhost");
         if (localhost) {
